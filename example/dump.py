@@ -3,7 +3,12 @@ import os
 
 from tinyapp.app import TinyApp
 from tinyapp.handler import ReqHandler
-from tinyapp.constants import PLAINTEXT, HTML
+from tinyapp.constants import PLAINTEXT
+
+"""
+TinyApp example which displays all the request info in plain text.
+Handy for debugging or exploring how TinyApp works.
+"""
 
 class han_Home(ReqHandler):
     def do_get(self, req):
