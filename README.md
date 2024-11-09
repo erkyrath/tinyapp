@@ -44,7 +44,7 @@ The `application` global is WSGI's entry point.
 To run the application:
 
 ```
-$ python -m tinyapp APP.WSGI
+$ python -m tinyapp minimal.wsgi
 ```
 
 This runs your application in a [werkzeug development server][werkzeug]. Load the URL `http://localhost:8001` the `han_Home` response. Or load `http://localhost:8001/file` to see the `han_File` response.
@@ -62,7 +62,7 @@ On the up side, if you edit your application or any module that it imports, werk
 A more usual setup looks like this:
 
 ```
-$ python -m tinyapp app.wsgi --uri /app --dir staticpath
+$ python -m tinyapp minimal.wsgi --uri /app --dir staticpath
 ```
 
 This mimics the way you would install the app under Apache. `http://localhost:8001/app` is routed to your app, as are all URLs under that (e.g. `http://localhost:8001/app/file`). All *other* URLs are served as [static files][SharedData] out of the `staticpath` directory.
