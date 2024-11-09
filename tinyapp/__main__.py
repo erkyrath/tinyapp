@@ -4,6 +4,7 @@ import importlib.util
 import importlib.machinery
 
 import werkzeug.serving
+import werkzeug.exceptions
 from werkzeug.middleware.shared_data import SharedDataMiddleware
 
 parser = argparse.ArgumentParser()
@@ -18,20 +19,10 @@ args = parser.parse_args()
 
 def application(environ, start_response):
     print('###', environ.get('PATH_INFO', '???'))
-    
+
     request_uri = environ.get('REQUEST_URI', '???')
-    status = '404 Not Found'
-    msg = '###Not found: %s' % (request_uri,)
-    output = status + '\n\n' + msg
-    boutput = output.encode()
-    content_type = 'text/plain; charset=utf-8'
-    
-    response_headers = [
-        ('Content-Type', content_type),
-        ('Content-Length', str(len(boutput)))
-    ]
-    start_response(status, response_headers)
-    yield boutput
+    notfound = werkzeug.exceptions.NotFound('URL not found: ' + request_uri)
+    return notfound(environ, start_response)
 
 loader = importlib.machinery.SourceFileLoader('_wsgiapp', args.filename)
 spec = importlib.util.spec_from_loader('_wsgiapp', loader=loader)
