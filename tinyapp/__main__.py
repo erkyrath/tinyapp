@@ -6,6 +6,7 @@ import importlib.machinery
 import werkzeug.serving
 import werkzeug.exceptions
 from werkzeug.middleware.shared_data import SharedDataMiddleware
+from werkzeug.wsgi import get_input_stream
 
 """
 Wrapper to run a tinyapp application in a server process. To run:
@@ -53,6 +54,8 @@ def application(environ, start_response):
 
     if new_path_info is not None:
         environ['PATH_INFO'] = new_path_info
+        if 'wsgi.input' in environ:
+            environ['wsgi.input'] = get_input_stream(environ)
         return appmod.application(environ, start_response)
 
     request_uri = environ.get('REQUEST_URI', '???')
