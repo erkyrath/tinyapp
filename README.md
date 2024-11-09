@@ -31,7 +31,7 @@ class han_File(ReqHandler):
 
 appinstance = TinyApp([
     ('', han_Home),
-    ('file', han_File),
+    ('/file', han_File),
 ])
 
 application = appinstance.application

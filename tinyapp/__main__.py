@@ -76,7 +76,7 @@ def application(environ, start_response):
     notfound = werkzeug.exceptions.NotFound('URL not found: ' + request_uri)
     return notfound(environ, start_response)
 
-# Import the app file as a Python module. We have to use SourceFileLoader
+# Import our app file as a Python module. We have to use SourceFileLoader
 # because the file suffix might not be ".py".
 # The module name doesn't matter, so we just call it "_wsgiapp".
 
