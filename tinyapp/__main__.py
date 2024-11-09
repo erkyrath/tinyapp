@@ -22,6 +22,7 @@ This uses the werkzeug development server. Like the docs say:
 parser = argparse.ArgumentParser()
 
 parser.add_argument('filename')
+parser.add_argument('--host', dest='host', default='localhost')
 parser.add_argument('-p', '--port', dest='port', type=int, default=8001)
 parser.add_argument('-u', '--uri', dest='uri')
 parser.add_argument('-d', '--dir', dest='dir')
@@ -74,5 +75,5 @@ static_files = None
 if args.dir:
     static_files = { '/': args.dir }
 
-werkzeug.serving.run_simple('localhost', args.port, application, use_reloader=True, static_files=static_files)
+werkzeug.serving.run_simple(args.host, args.port, application, use_reloader=True, static_files=static_files)
 
