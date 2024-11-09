@@ -53,11 +53,25 @@ def application(environ, start_response):
             new_path_info = path_info[ len(appuri) : ]
 
     if new_path_info is not None:
+        # Our app will handle this request.
         environ['PATH_INFO'] = new_path_info
+        
+        # WSGI's input stream is technically unterminated. (Apache
+        # gives us a terminated stream, but the raw werkzeug server
+        # doesn't.) Happily werkzeug has a wrapper function to make
+        # it behave sensibly. We apply it the same way a complete
+        # werkzeug stack would. See:
+        # https://werkzeug.palletsprojects.com/en/stable/request_data/
+        
         if 'wsgi.input' in environ:
             environ['wsgi.input'] = get_input_stream(environ)
+        
+        # Invoke the app.
         return appmod.application(environ, start_response)
 
+    # Our app didn't handle the request. Use werkzeug's handy NotFound
+    # exception (which is also a callable app).
+    
     request_uri = environ.get('REQUEST_URI', '???')
     notfound = werkzeug.exceptions.NotFound('URL not found: ' + request_uri)
     return notfound(environ, start_response)
