@@ -53,8 +53,9 @@ appmod = importlib.util.module_from_spec(spec)
 sys.modules['_wsgiapp'] = appmod
 spec.loader.exec_module(appmod)
 
+static_files = None
 if args.dir:
-    application = SharedDataMiddleware(application, { '/': args.dir })
+    static_files = { '/': args.dir }
 
-werkzeug.serving.run_simple('localhost', 8001, application, use_reloader=True)
+werkzeug.serving.run_simple('localhost', 8001, application, use_reloader=True, static_files=static_files)
 
