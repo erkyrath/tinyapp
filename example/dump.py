@@ -29,7 +29,10 @@ class han_Home(ReqHandler):
             yield 'query: %s\n' % (req.query,)
         if 'wsgi.input' in req.env:
             val = req.env['wsgi.input'].read()
-            yield 'input: %s' % (val,)
+            yield 'input: %s\n' % (val,)
+
+    def do_post(self, req):
+        return self.do_get(req)
 
 appinstance = TinyApp([
     ('', han_Home),
