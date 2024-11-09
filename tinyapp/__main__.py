@@ -4,6 +4,7 @@ import importlib.util
 import importlib.machinery
 
 import werkzeug.serving
+from werkzeug.middleware.shared_data import SharedDataMiddleware
 
 parser = argparse.ArgumentParser()
 
@@ -37,6 +38,9 @@ spec = importlib.util.spec_from_loader('_wsgiapp', loader=loader)
 appmod = importlib.util.module_from_spec(spec)
 sys.modules['_wsgiapp'] = appmod
 spec.loader.exec_module(appmod)
+
+if args.dir:
+    application = SharedDataMiddleware(application, { '/': args.dir })
 
 werkzeug.serving.run_simple('localhost', 8001, application)
 
