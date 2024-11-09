@@ -41,14 +41,11 @@ def application(environ, start_response):
     # meant to replicate how Apache/mod_wsgi works.
     
     new_path_info = None
-    if appuri == '/':
-        if path_info == appuri:
-            new_path_info = ''
-        else:
-            new_path_info = path_info
+    if path_info == appuri:
+        new_path_info = ''
     else:
-        if path_info == appuri:
-            new_path_info = ''
+        if appuri == '/':
+            new_path_info = path_info
         elif path_info.startswith(appuri+'/'):
             new_path_info = path_info[ len(appuri) : ]
 
