@@ -2,6 +2,10 @@ from tinyapp.app import TinyApp
 from tinyapp.handler import ReqHandler
 from tinyapp.constants import PLAINTEXT
 
+"""
+TinyApp example which just handles a couple of URLs. See README.md.
+"""
+
 class han_Home(ReqHandler):
     def do_get(self, req):
         yield '<html><body>This is an HTML response.</body></html>\n'
