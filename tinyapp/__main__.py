@@ -7,6 +7,18 @@ import werkzeug.serving
 import werkzeug.exceptions
 from werkzeug.middleware.shared_data import SharedDataMiddleware
 
+"""
+Wrapper to run a tinyapp application in a server process. To run:
+
+    python -m tinyapp APP.WSGI
+
+This uses the werkzeug development server. Like the docs say:
+
+> Do not use the development server when deploying to production. It
+> is intended for use only during local development. It is not
+> designed to be particularly efficient, stable, or secure.
+"""
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument('filename')
@@ -24,8 +36,10 @@ else:
 
 def application(environ, start_response):
     path_info = environ.get('PATH_INFO', '')
-    print('### path_info: %r' % (path_info,))
 
+    # The way we handle the PATH_INFO variable is a bit finicky. It is
+    # meant to replicate how Apache/mod_wsgi works.
+    
     new_path_info = None
     if appuri == '/':
         if path_info == appuri:
@@ -39,7 +53,6 @@ def application(environ, start_response):
             new_path_info = path_info[ len(appuri) : ]
 
     if new_path_info is not None:
-        print('### ...match, new path_info: %r' % (new_path_info,))
         environ['PATH_INFO'] = new_path_info
         return appmod.application(environ, start_response)
 
@@ -47,11 +60,17 @@ def application(environ, start_response):
     notfound = werkzeug.exceptions.NotFound('URL not found: ' + request_uri)
     return notfound(environ, start_response)
 
+# Import the app file as a Python module. We have to use SourceFileLoader
+# because the file suffix might not be ".py".
+# The module name doesn't matter, so we just call it "_wsgiapp".
+
 loader = importlib.machinery.SourceFileLoader('_wsgiapp', args.filename)
 spec = importlib.util.spec_from_loader('_wsgiapp', loader=loader)
 appmod = importlib.util.module_from_spec(spec)
 sys.modules['_wsgiapp'] = appmod
 spec.loader.exec_module(appmod)
+
+# Launch the werkzeug server.
 
 static_files = None
 if args.dir:
