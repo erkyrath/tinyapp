@@ -12,12 +12,14 @@ I only wrote TinyApp because I wanted to learn how WSGI worked. But now I've use
 
 ## A minimal application
 
-This is a very simple TinyApp application:
+This is a very simple TinyApp application (see `example/minimal.wsgi`):
 
 ```
 from tinyapp.app import TinyApp
 from tinyapp.handler import ReqHandler
 from tinyapp.constants import PLAINTEXT
+
+# Define two handlers.
 
 class han_Home(ReqHandler):
     def do_get(self, req):
@@ -28,6 +30,8 @@ class han_File(ReqHandler):
         req.set_content_type(PLAINTEXT)
         yield 'This is a text file...\n'
         yield 'Which is yielded on two lines.\n'
+
+# Create the TinyApp instance, mapping a URI to each of the above handlers.
 
 appinstance = TinyApp([
     ('', han_Home),
