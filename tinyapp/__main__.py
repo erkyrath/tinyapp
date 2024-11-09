@@ -56,5 +56,5 @@ spec.loader.exec_module(appmod)
 if args.dir:
     application = SharedDataMiddleware(application, { '/': args.dir })
 
-werkzeug.serving.run_simple('localhost', 8001, application)
+werkzeug.serving.run_simple('localhost', 8001, application, use_reloader=True)
 
