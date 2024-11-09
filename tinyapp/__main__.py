@@ -15,10 +15,33 @@ parser.add_argument('-d', '--dir', dest='dir')
 
 args = parser.parse_args()
 
-### https://werkzeug.palletsprojects.com/en/stable/middleware/shared_data/
+if not args.uri:
+    appuri = '/'
+else:
+    appuri = args.uri
+    if not appuri.startswith('/'):
+        appuri = '/' + appuri
 
 def application(environ, start_response):
-    print('###', environ.get('PATH_INFO', '???'))
+    path_info = environ.get('PATH_INFO', '')
+    print('### path_info: %r' % (path_info,))
+
+    new_path_info = None
+    if appuri == '/':
+        if path_info == appuri:
+            new_path_info = ''
+        else:
+            new_path_info = path_info
+    else:
+        if path_info == appuri:
+            new_path_info = ''
+        elif path_info.startswith(appuri+'/'):
+            new_path_info = path_info[ len(appuri) : ]
+
+    if new_path_info is not None:
+        print('### ...match, new path_info: %r' % (new_path_info,))
+        environ['PATH_INFO'] = new_path_info
+        return appmod.application(environ, start_response)
 
     request_uri = environ.get('REQUEST_URI', '???')
     notfound = werkzeug.exceptions.NotFound('URL not found: ' + request_uri)
