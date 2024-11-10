@@ -14,7 +14,7 @@ TinyApp supports Python 3.7 and later. That's really old, but one of those proje
 
 ## A minimal application
 
-This is a very simple TinyApp application (see `example/minimal.wsgi`):
+This is a very simple TinyApp application (see [`example/minimal.wsgi`](example/minimal.wsgi)):
 
 ```
 from tinyapp.app import TinyApp
@@ -183,7 +183,7 @@ TinyRequest methods:
 - `req.set_cookie(key, val, path='/', httponly=False, maxage=None)`: Set an outgoing cookie via header. (See [http.cookies][httpcookies].)
 - `req.add_header(key, val)`: Add an arbitrary header.
 
-[httpcookies]: https://docs.python.org/3/library/http.cookies.html
+[httpcookies]: https://docs.python.org/3/library/http.cookies.htmla
 
 ### Request matches
 
@@ -257,3 +257,4 @@ appinstance = TinyApp([
 
 By the way, if you want to add functionality to the TinyRequest class, you can create a derived class and then override the `app.create_request()` factory function.
 
+The [`example/authdemo.wsgi`](example/authdemo.wsgi) example demonstrates these features.
