@@ -174,4 +174,9 @@ TinyRequest methods:
 
 - `req.get_query_field(key, default=None)`: Get one field in the query string of the request (the `?key=value` part of the URL).
 - `req.get_input_field(key, default=None)`: Get one field from the POST data of the request.
+- `req.set_status(val)`: Set the HTTP status (like `"200 OK"`).
+- `req.set_content_type(val)`: Set the HTTP `Content-Type` header.
+- `req.add_header(key, val)`: Add an arbitrary header.
+- `req.set_cookie(key, val, path='/', httponly=False, maxage=None)`: Set a cookie via header. (See [http.cookies][httpcookies].)
 
+[httpcookies]: https://docs.python.org/3/library/http.cookies.html
