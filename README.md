@@ -53,7 +53,7 @@ To run the application:
 $ python -m tinyapp example/minimal.wsgi
 ```
 
-This runs your application in a [werkzeug development server][werkzeug]. Load the URL `http://localhost:8001` the `han_Home` response. Or load `http://localhost:8001/file` to see the `han_File` response.
+This runs your application in a [werkzeug development server][werkzeug]. Load the URL `http://localhost:8001` to see the `han_Home` response. Or load `http://localhost:8001/file` to see the `han_File` response.
 
 You can also supply `--port` and `--host` arguments, as is traditional for miniservers. To make your application visible outside the local machine, use `--host 0.0.0.0`.
 
@@ -85,13 +85,17 @@ This isn't a step-by-step recipe, but the basics are:
 
 - Install the `mod-wsgi` module:
 
-	pip3 install mod-wsgi
-	
+```
+pip3 install mod-wsgi
+```
+
 - Update your Apache `httpd.conf` file to load the module:
 
-	LoadModule wsgi_module /path/to/mod_wsgi.so
-	WSGIScriptAlias /app /path/to/app.wsgi
-	WSGIPythonPath /path/to/libdir
+```
+LoadModule wsgi_module /path/to/mod_wsgi.so
+WSGIScriptAlias /app /path/to/app.wsgi
+WSGIPythonPath /path/to/libdir
+```
 
 Note that `/app` is the root URI that your app will use (like the `--uri /app` argument above). The `libdir` is a directory containing the modules your app will import, and also `tinyapp` itself (if that isn't in your system Python path).
 
