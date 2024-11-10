@@ -46,6 +46,7 @@ login_template = '''
 home_template = '''
 <html><body>
 <p>Welcome. You are logged in as {{username}}.</p>
+<p><a href="/logout">Log out</a></p>
 </body></html>
 '''
 
@@ -74,6 +75,12 @@ class han_Home(ReqHandler):
         req.set_cookie('loggedinas', username)
         raise HTTPRedirectPost('/')
 
+class han_Logout(ReqHandler):
+    def do_get(self, req):
+        req.set_cookie('loggedinas', '', maxage=0)
+        raise HTTPRedirectPost('/')
+        
+
 class AuthDemoRequest(TinyRequest):
     """Our app-specific subclass of TinyRequest. This just has a spot
     to stash the current username.
@@ -91,6 +98,7 @@ class AuthDemoApp(TinyApp):
     def __init__(self):
         handlers = [
             ('', han_Home),
+            ('/logout', han_Logout),
         ]
         TinyApp.__init__(self, handlers, wrapall = [ checklogin ])
 
