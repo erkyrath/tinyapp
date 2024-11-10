@@ -40,15 +40,34 @@ login_template = '''
 </div>
 <p>{{formerror}}</p>
 </form>
+<p><a href="/content">View the secret content</a></p>
 </body></html>
 '''
 
 home_template = '''
 <html><body>
 <p>Welcome. You are logged in as {{username}}.</p>
+<p><a href="/content">View the secret content</a></p>
 <p><a href="/logout">Log out</a></p>
 </body></html>
 '''
+
+content_template = '''
+<html><body>
+<p>This is the secret content, which you can only see if you're logged in.</p>
+<p><a href="/logout">Log out</a></p>
+</body></html>
+'''
+
+def findusercookie(req, han):
+    if 'loggedinas' in req.cookies:
+        req._username = req.cookies['loggedinas'].value
+    return han(req)
+
+def checkloggedin(req, han):
+    if not req._username:
+        raise HTTPError('401 Unauthorized', 'Not logged in')
+    return han(req)
 
 class han_Home(ReqHandler):
     def do_get(self, req):
@@ -79,6 +98,12 @@ class han_Logout(ReqHandler):
     def do_get(self, req):
         req.set_cookie('loggedinas', '', maxage=0)
         raise HTTPRedirectPost('/')
+
+@beforeall(checkloggedin)
+class han_Content(ReqHandler):
+    def do_get(self, req):
+        tem = StinjaTemplate(content_template)
+        yield tem.render()
         
 
 class AuthDemoRequest(TinyRequest):
@@ -89,18 +114,14 @@ class AuthDemoRequest(TinyRequest):
         TinyRequest.__init__(self, app, env)
         self._username = None
 
-def checklogin(req, han):
-    if 'loggedinas' in req.cookies:
-        req._username = req.cookies['loggedinas'].value
-    return han(req)
-
 class AuthDemoApp(TinyApp):
     def __init__(self):
         handlers = [
             ('', han_Home),
             ('/logout', han_Logout),
+            ('/content', han_Content),
         ]
-        TinyApp.__init__(self, handlers, wrapall = [ checklogin ])
+        TinyApp.__init__(self, handlers, wrapall = [ findusercookie ])
 
     def create_request(self, environ):
         return AuthDemoRequest(self, environ)
