@@ -45,7 +45,9 @@ application = appinstance.application
 
 The `application` global is WSGI's entry point.
 
-## Testing on the command line
+## Running the thing
+
+### Testing on the command line
 
 To run the application:
 
@@ -77,7 +79,7 @@ This mimics the way you would install the app under Apache. `http://localhost:80
 
 [SharedData]: https://werkzeug.palletsprojects.com/en/stable/middleware/shared_data/
 
-## Installing on Apache
+### Installing on Apache
 
 This is the normal mode of TinyApp in production.
 
@@ -100,4 +102,65 @@ WSGIPythonPath /path/to/libdir
 Note that `/app` is the root URI that your app will use (like the `--uri /app` argument above). The `libdir` is a directory containing the modules your app will import, and also `tinyapp` itself (if that isn't in your system Python path).
 
 - Restart Apache to pick up the changes.
+
+### Installing on other servers
+
+WSGI is supposed to be a universal glue, so TinyApp should work in anything. See [werkzeug's list of production servers][prodserv]. I've only tested Apache though.
+
+[prodserv]: https://werkzeug.palletsprojects.com/en/stable/deployment/
+
+## A quick tour of TinyApp
+
+When an HTTP request comes in, TinyApp constructs a `TinyRequest` object (wrapping the request). It then looks through your list of handlers for one which matches the request. If it finds one, it calls `handler.do_get(req)`, `handler.do_post(req)`, or `handler.do_head(req)` as appropriate. Override one or more of these methods to do your web stuff.
+
+### Your basic handler
+
+The simplest thing your handler can do is yield one or more strings.
+
+```
+class han_Home(ReqHandler):
+    def do_get(self, req):
+        yield '<html><body>This is an HTML response.</body></html>\n'
+```
+
+By default, the Content-Type is HTML. You can alter this by calling `set_content_type()`. (Before you start yielding, please.) A few handy Content-Type values are defined in `tinyapp.constants`.
+
+```
+from tinyapp.constants import PLAINTEXT
+
+class han_File(ReqHandler):
+    def do_get(self, req):
+        req.set_content_type(PLAINTEXT)
+        yield 'This is a text file...\n'
+```
+
+Your handler can raise `HTTPError` (from `tinyapp.excepts`) to generate an HTTP error result.
+
+```
+from tinyapp.excepts import HTTPError
+
+class han_File(ReqHandler):
+    def do_get(self, req):
+        raise HTTPError('404 Not Found', 'File not found')
+```
+
+### What to do with a request
+
+The TinyRequest has a few useful attributes:
+
+- `req.app`: A reference to the TinyApp.
+- `req.env`: The WSGI environment that generated the request.
+- `req.request_method`: `"GET"`, `"POST"`, or `"HEAD"`.
+- `req.path_info`: The URI relative to your app. (That is, the app's URI prefix has been removed.)
+- `req.query`: A dict which represents the query string of the request (the `?key=value` part of the URL).
+- `req.input`: A dict which represents the POST data of the request, if any.
+
+(Note that `req.query` and `req.input` both take the form of a dict mapping keys to _lists_ of values. See [urllib.parse.parse_qs()][parse_qs].
+
+[parse_qs]: https://docs.python.org/3/library/urllib.parse.html#urllib.parse.parse_qs
+
+TinyRequest methods:
+
+- `req.get_query_field(key, default=None)`: Get one field in the query string of the request (the `?key=value` part of the URL).
+- `req.get_input_field(key, default=None)`: Get one field from the POST data of the request.
 
