@@ -222,8 +222,10 @@ A wrapper is simply a function that looks like:
 
 ```
 def wrapperfunc(req, han):
+    # perhaps yield a response and then return
     # perhaps throw an HTTPError
     # perhaps modify req
+    # pass the request down the chain...
     return han(req)
 ```
 
