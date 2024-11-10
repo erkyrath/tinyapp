@@ -7,7 +7,14 @@ from tinyapp.handler import before, beforeall
 from tinyapp.excepts import HTTPError, HTTPRedirectPost
 
 """
-###
+An example of a WSGI app which supports user authentication. In
+this example, you can use any username and the password "swordfish".
+
+The "secret content" link will only work if you're logged in.
+
+Of course in real life you'd want to use a user database, hashed
+cookies, XSRF cookies, the secure_site=True argument for TinyApp,
+and a battery of orbital laser cannons.
 
 To run:
     python -m tinyapp example/authdemo.wsgi
