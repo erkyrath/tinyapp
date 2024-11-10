@@ -168,9 +168,9 @@ The TinyRequest has a few useful attributes:
 - `req.match`: The regexp match object from matching the request URI. See "Matches", below.
 - `req.query`: A dict which represents the query string of the request (the `?key=value` part of the URL).
 - `req.input`: A dict which represents the POST data of the request, if any.
-- `req.cookies`: A [SimpleCookies][httpcookies] object representing the incoming cookies.
+- `req.cookies`: A [SimpleCookie][httpcookies] object representing the incoming cookies.
 
-(Note that `req.query` and `req.input` both take the form of a dict mapping keys to _lists_ of values. See [urllib.parse.parse_qs()][parse_qs].
+(Note that `req.query` and `req.input` both take the form of a dict mapping keys to _lists_ of values. See [urllib.parse.parse_qs()][parse_qs]. Use `get_query_field()`, `get_input_field()` if you expect a single value.)
 
 [parse_qs]: https://docs.python.org/3/library/urllib.parse.html#urllib.parse.parse_qs
 
