@@ -8,6 +8,11 @@ from tinyapp.constants import PLAINTEXT
 """
 TinyApp example which displays all the request info in plain text.
 Handy for debugging or exploring how TinyApp works.
+
+The handler uses a match-everything regex, so you can get a dump of
+requests like
+
+    http://localhost:8001/whatever?foo=bar
 """
 
 class han_Home(ReqHandler):

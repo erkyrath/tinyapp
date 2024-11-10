@@ -238,7 +238,7 @@ class han_Home(ReqHandler):
         yield '<html><body>This is an HTML response.</body></html>\n'
 ```
 
-To apply a wrapper to *both* the `do_get()` or `do_post()` method in a ReqHandler:
+To apply a wrapper to *both* the `do_get()` or `do_post()` methods in a ReqHandler:
 
 ```
 @beforeall(wrapperfunc)
@@ -247,7 +247,7 @@ class han_Home(ReqHandler):
         yield '<html><body>This is an HTML response.</body></html>\n'
 ```
 
-To apply wrappers to every method in every ReqHandler in your app, pass a `wrapall` list to the TinyApp constructor:
+To apply wrappers to *every* method in every ReqHandler in your app, pass a `wrapall` list to the TinyApp constructor:
 
 ```
 appinstance = TinyApp([
