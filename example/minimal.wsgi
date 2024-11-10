@@ -25,4 +25,6 @@ appinstance = TinyApp([
     ('/file', han_File),
 ])
 
+# Define the module "application" global, which is WSGI's entry point.
+
 application = appinstance.application
