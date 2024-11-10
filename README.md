@@ -163,6 +163,7 @@ The TinyRequest has a few useful attributes:
 - `req.env`: The WSGI environment that generated the request.
 - `req.request_method`: `"GET"`, `"POST"`, or `"HEAD"`.
 - `req.path_info`: The URI relative to your app. (That is, the app's URI prefix has been removed.)
+- `req.match`: The regexp match object from matching the request URI. See "Matches", below.
 - `req.query`: A dict which represents the query string of the request (the `?key=value` part of the URL).
 - `req.input`: A dict which represents the POST data of the request, if any.
 
@@ -180,3 +181,26 @@ TinyRequest methods:
 - `req.set_cookie(key, val, path='/', httponly=False, maxage=None)`: Set a cookie via header. (See [http.cookies][httpcookies].)
 
 [httpcookies]: https://docs.python.org/3/library/http.cookies.html
+
+### Request matches
+
+In your list of handlers:
+
+```
+appinstance = TinyApp([
+    ('', han_Home),
+    ('/file', han_File),
+])
+```
+
+...the URI part of the tuple is really a regular expression. (It's always a complete match, with `$` assumed at the end.)
+
+This lets you do some neat tricks. The regexp can include groups:
+
+```
+    ('/item/(?P<category>[^/]+)/(?P<item>[^/]+)', han_SelectItem),
+```
+
+Here a request like `/item/cheese/stilton` generates a [Match][rematch] object with two named groups: `category` and `item`. The Match is available as `req.match`, so you could examine `req.match.group('category')`, for example.
+
+[rematch]: https://docs.python.org/3/library/re.html#re.Match
