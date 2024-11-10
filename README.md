@@ -4,11 +4,13 @@
 
 This is a very simple framework for building web apps in Python.
 
-If you're thinking about using this, you probably want to go use [Flask][] instead. TinyApp does the same thing as Flask, only less elegantly and unsupported.
+If you're thinking about using this, you probably want to go use [Flask][] instead. TinyApp does the same thing as Flask, only less complete, less elegant, and unsupported.
 
 [Flask]: https://flask.palletsprojects.com/
 
-I only wrote TinyApp because I wanted to learn how WSGI worked. But now I've used it in two projects. So I might as well break it out into its own library and document it at least a little.
+I only wrote TinyApp because I wanted to learn how WSGI worked. Now I do! And now I've used it in two projects (which could have been Flask but aren't). So I might as well break TinyApp out into its own library and document it at least a little.
+
+TinyApp supports Python 3.7 and later. That's really old, but one of those projects I mentioned is on an old server with Py 3.7, so I'm stuck with it.
 
 ## A minimal application
 
