@@ -123,7 +123,7 @@ class han_Home(ReqHandler):
         yield '<html><body>This is an HTML response.</body></html>\n'
 ```
 
-By default, the Content-Type is HTML. You can alter this by calling `set_content_type()`. (Before you start yielding, please.) A few handy Content-Type values are defined in `tinyapp.constants`.
+By default, the `Content-Type` is HTML. You can alter this by calling `set_content_type()`. (Before you start yielding, please.) A few handy Content-Type values are defined in `tinyapp.constants`.
 
 ```
 from tinyapp.constants import PLAINTEXT
@@ -142,6 +142,17 @@ from tinyapp.excepts import HTTPError
 class han_File(ReqHandler):
     def do_get(self, req):
         raise HTTPError('404 Not Found', 'File not found')
+```
+
+If you want to return binary data, raise `HTTPRawResponse`. In this case you must construct the list of headers (including `Content-Length`!) and also supply an iterator that yields some number of `bytes` objects.
+
+```
+from tinyapp.excepts import HTTPRawResponse
+
+class han_File(ReqHandler):
+    def do_get(self, req):
+        # ... construct headerlist and iterbytes
+        raise HTTPRawResponse('200 OK', headerlist, iterbytes)
 ```
 
 ### What to do with a request
