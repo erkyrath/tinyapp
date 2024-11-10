@@ -113,6 +113,8 @@ WSGI is supposed to be a universal glue, so TinyApp should work in anything. See
 
 When an HTTP request comes in, TinyApp constructs a `TinyRequest` object (wrapping the request). It then looks through your list of handlers for one which matches the request. If it finds one, it calls `handler.do_get(req)`, `handler.do_post(req)`, or `handler.do_head(req)` as appropriate. Override one or more of these methods to do your web stuff.
 
+(There is a default implementation of `do_head(req)` which just calls `do_get(req)` and then returns the headers with no data. This is usually good enough.)
+
 ### Your basic handler
 
 The simplest thing your handler can do is yield one or more strings.
@@ -166,6 +168,7 @@ The TinyRequest has a few useful attributes:
 - `req.match`: The regexp match object from matching the request URI. See "Matches", below.
 - `req.query`: A dict which represents the query string of the request (the `?key=value` part of the URL).
 - `req.input`: A dict which represents the POST data of the request, if any.
+- `req.cookies`: A [SimpleCookies][httpcookies] object representing the incoming cookies.
 
 (Note that `req.query` and `req.input` both take the form of a dict mapping keys to _lists_ of values. See [urllib.parse.parse_qs()][parse_qs].
 
@@ -175,10 +178,10 @@ TinyRequest methods:
 
 - `req.get_query_field(key, default=None)`: Get one field in the query string of the request (the `?key=value` part of the URL).
 - `req.get_input_field(key, default=None)`: Get one field from the POST data of the request.
-- `req.set_status(val)`: Set the HTTP status (like `"200 OK"`).
-- `req.set_content_type(val)`: Set the HTTP `Content-Type` header.
+- `req.set_status(val)`: Set the response HTTP status (like `"200 OK"`).
+- `req.set_content_type(val)`: Set the response HTTP `Content-Type` header.
+- `req.set_cookie(key, val, path='/', httponly=False, maxage=None)`: Set an outgoing cookie via header. (See [http.cookies][httpcookies].)
 - `req.add_header(key, val)`: Add an arbitrary header.
-- `req.set_cookie(key, val, path='/', httponly=False, maxage=None)`: Set a cookie via header. (See [http.cookies][httpcookies].)
 
 [httpcookies]: https://docs.python.org/3/library/http.cookies.html
 
@@ -204,3 +207,51 @@ This lets you do some neat tricks. The regexp can include groups:
 Here a request like `/item/cheese/stilton` generates a [Match][rematch] object with two named groups: `category` and `item`. The Match is available as `req.match`, so you could examine `req.match.group('category')`, for example.
 
 [rematch]: https://docs.python.org/3/library/re.html#re.Match
+
+### Handler wrappers
+
+A handler wrapper is a function that looks at a request and either
+
+- throws an exception, or
+- handles the request, or
+- passes it on, perhaps adding info first.
+
+For example, you might write a wrapper function to load user account data based on cookies. Then another wrapper for a particular resource could check that account data and throw a 401 if the account is not authorized.
+
+A wrapper is simply a function that looks like:
+
+```
+def wrapperfunc(req, han):
+    # perhaps throw an HTTPError
+    # perhaps modify req
+    return han(req)
+```
+
+To apply a wrapper to a `do_get()` or `do_post()` method in a ReqHandler:
+
+```
+class han_Home(ReqHandler):
+    @before(wrapperfunc)
+    def do_get(self, req):
+        yield '<html><body>This is an HTML response.</body></html>\n'
+```
+
+To apply a wrapper to *both* the `do_get()` or `do_post()` method in a ReqHandler:
+
+```
+@beforeall(wrapperfunc)
+class han_Home(ReqHandler):
+    def do_get(self, req):
+        yield '<html><body>This is an HTML response.</body></html>\n'
+```
+
+To apply wrappers to every method in every ReqHandler in your app, pass a `wrapall` list to the TinyApp constructor:
+
+```
+appinstance = TinyApp([
+    ('', han_Home),
+], wrapall = [ wrapperfunc ])
+```
+
+By the way, if you want to add functionality to the TinyRequest class, you can create a derived class and then override the `app.create_request()` factory function.
+
