@@ -4,6 +4,9 @@ from tinyapp.constants import PLAINTEXT
 
 """
 TinyApp example which just handles a couple of URLs. See README.md.
+
+To run:
+    python -m tinyapp example/minimal.wsgi
 """
 
 # Define two handlers.
