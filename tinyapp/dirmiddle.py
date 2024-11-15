@@ -5,7 +5,18 @@ import urllib.parse
 from werkzeug.exceptions import NotFound
 from werkzeug.middleware.shared_data import SharedDataMiddleware
 
+# This module imports werkzeug, but it is only used by __main__
+# (which also imports werkzeug).
+
 class StaticFileMiddleware:
+    """A WSGI application component to serve a directory tree of
+    static files.
+
+    This uses werkzeug's SharedDataMiddleware component to serve
+    the files themselves. It adds the capability to serve the
+    *directories*, either by finding "index.html" or generating
+    a directory listing.
+    """
     def __init__(self, app, appuri, dirtree):
         self.app = app
         self.appuri = appuri

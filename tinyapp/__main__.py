@@ -19,6 +19,10 @@ This uses the werkzeug development server. Like the docs say:
 > Do not use the development server when deploying to production. It
 > is intended for use only during local development. It is not
 > designed to be particularly efficient, stable, or secure.
+
+Note that werkzeug is not listed as a dependency of tinyapp as a
+library. You only need werkzeug when running tinyapp *on the command
+line*, as described above.
 """
 
 parser = argparse.ArgumentParser()
@@ -92,7 +96,6 @@ sys.modules['_wsgiapp'] = appmod
 spec.loader.exec_module(appmod)
 
 # Launch the werkzeug server.
-
 
 if args.dir:
     from tinyapp.dirmiddle import StaticFileMiddleware
