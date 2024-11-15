@@ -5,10 +5,10 @@ from werkzeug.exceptions import NotFound
 from werkzeug.middleware.shared_data import SharedDataMiddleware
 
 class StaticFileMiddleware:
-    def __init__(self, app, appuri, appurislash, dirtree):
+    def __init__(self, app, appuri, dirtree):
         self.app = app
         self.appuri = appuri
-        self.appurislash = appurislash
+        self.appurislash = '/' if appuri == '/' else appuri+'/'
         self.dirtree = dirtree
         self.fileapp = SharedDataMiddleware(NotFound('URL not found'), { '/': dirtree })
 
@@ -34,7 +34,19 @@ class StaticFileMiddleware:
                 return self.dirlisting(realpath, environ, start_response)
         return self.fileapp(environ, start_response)
 
-    DIRTEMPLATE = '''<!DOCTYPE html>
+    def dirlisting(self, realpath, environ, start_response):
+        output = DIRTEMPLATE
+        val = environ.get('PATH_INFO', '')
+        output = output.replace('$PATH$', html.escape(val))
+        boutput = output.encode()
+        response_headers = [
+            ('Content-Type', 'text/html; charset=utf-8'),
+            ('Content-Length', str(len(boutput)))
+        ]
+        start_response('200 OK', response_headers)
+        yield boutput
+
+DIRTEMPLATE = '''<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -47,15 +59,3 @@ $FILES$
 </ul>
 </body>
 </html>'''
-    def dirlisting(self, realpath, environ, start_response):
-        output = self.DIRTEMPLATE
-        val = environ.get('PATH_INFO', '')
-        output = output.replace('$PATH$', html.escape(val))
-        boutput = output.encode()
-        response_headers = [
-            ('Content-Type', 'text/html; charset=utf-8'),
-            ('Content-Length', str(len(boutput)))
-        ]
-        start_response('200 OK', response_headers)
-        yield boutput
-

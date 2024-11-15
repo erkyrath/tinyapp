@@ -96,7 +96,7 @@ spec.loader.exec_module(appmod)
 
 if args.dir:
     from tinyapp.dirmiddle import StaticFileMiddleware
-    application = StaticFileMiddleware(application, appuri, appurislash, args.dir)
+    application = StaticFileMiddleware(application, appuri, args.dir)
 
 werkzeug.serving.run_simple(args.host, args.port, application, threaded=args.threaded, use_reloader=True)
 
