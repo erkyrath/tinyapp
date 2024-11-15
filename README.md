@@ -75,8 +75,6 @@ $ python -m tinyapp example/minimal.wsgi --uri /app --dir staticpath
 
 This mimics the way you would install the app under Apache. `http://localhost:8001/app` is routed to your app, as are all URLs under that (e.g. `http://localhost:8001/app/file`). All *other* URLs are served as [static files][SharedData] out of the `staticpath` directory.
 
-(The `--dir` argument does _not_ load `index.html` or directory listings for directory paths. So in this mode, the root `http://localhost:8001/` URL will always return a 404.)
-
 [SharedData]: https://werkzeug.palletsprojects.com/en/stable/middleware/shared_data/
 
 ### Installing on Apache
