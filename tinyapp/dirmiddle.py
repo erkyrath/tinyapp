@@ -14,7 +14,7 @@ class StaticFileMiddleware:
 
     This uses werkzeug's SharedDataMiddleware component to serve
     the files themselves. It adds the capability to serve the
-    *directories*, either by finding "index.html" or generating
+    *directories*, by either finding "index.html" or generating
     a directory listing.
     """
     def __init__(self, app, appuri, dirtree):
@@ -25,6 +25,8 @@ class StaticFileMiddleware:
         self.fileapp = SharedDataMiddleware(NotFound('URL not found'), { '/': dirtree })
 
     def __call__(self, environ, start_response):
+        """Handle a request.
+        """
         path = environ.get('PATH_INFO', '')
         if path == self.appuri or path.startswith(self.appurislash):
             return self.app(environ, start_response)
@@ -32,6 +34,7 @@ class StaticFileMiddleware:
             path = path[ 1 : ]
         realpath = os.path.join(self.dirtree, path)
         if os.path.isdir(realpath):
+            # This path is a directory. We handle it.
             if path != '' and not path.endswith('/'):
                 return self.redirectdir('/'+path+'/', environ, start_response)
             if path.endswith('/'):
@@ -40,13 +43,21 @@ class StaticFileMiddleware:
                 pathindex = path + '/index.html'
             realpathindex = os.path.join(self.dirtree, pathindex)
             if os.path.isfile(realpathindex):
+                # Change PATH_INFO and pass to SharedDataMiddleware.
                 environ['PATH_INFO'] = '/'+pathindex
                 return self.fileapp(environ, start_response)
             else:
+                # Generate a listing.
                 return self.dirlisting(realpath, environ, start_response)
+
+        # This path is a file. Pass it along to SharedDataMiddleware,
+        # which will either handle it or 404.
         return self.fileapp(environ, start_response)
 
     def redirectdir(self, newuri, environ, start_response):
+        """Return a 301 redirect for URLs like "/dirname" (redirecting
+        to "/dirname/").
+        """
         response_headers = [
             ('Location', newuri),
             ('Content-Length', '0'),
@@ -55,6 +66,8 @@ class StaticFileMiddleware:
         yield b''
     
     def dirlisting(self, realpath, environ, start_response):
+        """Generate an HTML directory listing.
+        """
         ls = []
         for ent in os.scandir(realpath):
             name = ent.name
@@ -74,6 +87,8 @@ class StaticFileMiddleware:
         start_response('200 OK', response_headers)
         yield boutput
 
+# A very simple template for the directory listing.
+        
 DIRTEMPLATE = '''<!DOCTYPE html>
 <html>
 <head>
