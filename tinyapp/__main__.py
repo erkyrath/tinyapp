@@ -1,11 +1,12 @@
 import sys
+import os.path
 import argparse
+import html
 import importlib.util
 import importlib.machinery
 
 import werkzeug.serving
 import werkzeug.exceptions
-from werkzeug.middleware.shared_data import SharedDataMiddleware
 from werkzeug.wsgi import get_input_stream
 
 """
@@ -33,10 +34,12 @@ args = parser.parse_args()
 
 if not args.uri:
     appuri = '/'
+    appurislash = appuri
 else:
     appuri = args.uri
     if not appuri.startswith('/'):
         appuri = '/' + appuri
+    appurislash = appuri+'/'
 
 def application(environ, start_response):
     path_info = environ.get('PATH_INFO', '')
@@ -50,7 +53,7 @@ def application(environ, start_response):
     else:
         if appuri == '/':
             new_path_info = path_info
-        elif path_info.startswith(appuri+'/'):
+        elif path_info.startswith(appurislash):
             new_path_info = path_info[ len(appuri) : ]
 
     if new_path_info is not None:
@@ -77,6 +80,7 @@ def application(environ, start_response):
     notfound = werkzeug.exceptions.NotFound('URL not found: ' + request_uri)
     return notfound(environ, start_response)
 
+
 # Import our app file as a Python module. We have to use SourceFileLoader
 # because the file suffix might not be ".py".
 # The module name doesn't matter, so we just call it "_wsgiapp".
@@ -89,9 +93,10 @@ spec.loader.exec_module(appmod)
 
 # Launch the werkzeug server.
 
-static_files = None
-if args.dir:
-    static_files = { '/': args.dir }
 
-werkzeug.serving.run_simple(args.host, args.port, application, threaded=args.threaded, use_reloader=True, static_files=static_files)
+if args.dir:
+    from tinyapp.dirmiddle import StaticFileMiddleware
+    application = StaticFileMiddleware(application, appuri, appurislash, args.dir)
+
+werkzeug.serving.run_simple(args.host, args.port, application, threaded=args.threaded, use_reloader=True)
 
