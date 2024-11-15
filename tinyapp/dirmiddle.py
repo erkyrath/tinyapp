@@ -21,7 +21,8 @@ class StaticFileMiddleware:
         realpath = os.path.join(self.dirtree, path)
         print('### path', path, realpath)
         if os.path.isdir(realpath):
-            ### redir 301 for the non-slashed case?
+            if path != '' and not path.endswith('/'):
+                return self.redirectdir('/'+path+'/', environ, start_response)
             if path.endswith('/'):
                 pathindex = path + 'index.html'
             else:
@@ -34,6 +35,14 @@ class StaticFileMiddleware:
                 return self.dirlisting(realpath, environ, start_response)
         return self.fileapp(environ, start_response)
 
+    def redirectdir(self, newuri, environ, start_response):
+        response_headers = [
+            ('Location', newuri),
+            ('Content-Length', '0'),
+        ]
+        start_response('301 Moved Permanently', response_headers)
+        yield b''
+    
     def dirlisting(self, realpath, environ, start_response):
         output = DIRTEMPLATE
         val = environ.get('PATH_INFO', '')
