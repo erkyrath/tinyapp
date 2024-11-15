@@ -19,7 +19,6 @@ class StaticFileMiddleware:
         if path.startswith('/'):
             path = path[ 1 : ]
         realpath = os.path.join(self.dirtree, path)
-        print('### path', path, realpath)
         if os.path.isdir(realpath):
             if path != '' and not path.endswith('/'):
                 return self.redirectdir('/'+path+'/', environ, start_response)
