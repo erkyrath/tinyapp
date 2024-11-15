@@ -1,5 +1,6 @@
 import os.path
 import html
+import urllib.parse
 
 from werkzeug.exceptions import NotFound
 from werkzeug.middleware.shared_data import SharedDataMiddleware
@@ -43,9 +44,17 @@ class StaticFileMiddleware:
         yield b''
     
     def dirlisting(self, realpath, environ, start_response):
+        ls = []
+        for ent in os.scandir(realpath):
+            name = ent.name
+            if ent.is_dir():
+                name = name + '/'
+            ls.append('<li><a href="%s">%s</a>\n' % (urllib.parse.quote(name), html.escape(name),))
+        ls.sort(key=lambda val:val.lower())
         output = DIRTEMPLATE
         val = environ.get('PATH_INFO', '')
         output = output.replace('$PATH$', html.escape(val))
+        output = output.replace('$FILES$', ''.join(ls))
         boutput = output.encode()
         response_headers = [
             ('Content-Type', 'text/html; charset=utf-8'),
